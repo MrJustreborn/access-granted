@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Management</title>
+</head>
+<body>
+    <h2>Client Access Management</h2>
+    <p>Client IP: {{ client_ip }}</p>
+    <p>Default /64 Subnet: {{ subnet }}</p>
+
+    <form method="post">
+        <label>Duration (hours):</label>
+        <input type="number" name="duration" value="24" min="1">
+
+        <button type="submit" name="target" value="client">Grant Client</button>
+        <button type="submit" name="target" value="subnet">Grant Subnet</button>
+    </form>
+</body>
+</html>
