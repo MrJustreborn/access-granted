@@ -1,0 +1,7 @@
+[Unit]
+Description=Reload NGINX if whitelist config changed and config test passes
+After=nginx.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'sleep 2 && /usr/sbin/nginx -t && /usr/sbin/nginx -s reload'

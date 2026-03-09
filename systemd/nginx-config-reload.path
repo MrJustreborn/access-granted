@@ -1,0 +1,8 @@
+[Unit]
+Description=Watch nginx whitelist config for changes
+
+[Path]
+PathModified=/etc/nginx/whitelist/*.conf
+
+[Install]
+WantedBy=multi-user.target
