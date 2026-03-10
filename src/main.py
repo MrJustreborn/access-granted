@@ -1,3 +1,4 @@
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, request, redirect, make_response
 import ipaddress
 import datetime
@@ -8,6 +9,15 @@ DYNAMIC_WHITELIST_FILE = "./whitelist_dynamic.conf"
 DEFAULT_DURATION_HOURS = 24
 
 app = Flask(__name__)
+
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+def cleanup_job():
+    print("Running cleanup...")
+    cleanup_expired()
+
+scheduler.add_job(cleanup_job, 'interval', minutes=1)
 
 def read_whitelist():
     """
