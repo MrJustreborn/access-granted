@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, make_response
 import ipaddress
 import datetime
 import os
@@ -9,34 +9,73 @@ DEFAULT_DURATION_HOURS = 24
 
 app = Flask(__name__)
 
-def write_whitelist(ip_or_subnet, duration_hours, comment=None):
-    expire_time = datetime.datetime.now() + datetime.timedelta(hours=duration_hours)
-    expire_str = expire_time.isoformat()
+def read_whitelist():
+    """
+    Reads the whitelist as:
+    [{'ip': <str>, 'expires': <str ISO>, 'comment': <str>}]
+    """
     entries = []
-    
+
     if os.path.exists(DYNAMIC_WHITELIST_FILE):
         with open(DYNAMIC_WHITELIST_FILE, "r") as f:
             lines = f.readlines()
+
         i = 0
         while i < len(lines):
             line = lines[i].strip()
             if line.startswith("# expires at") and i + 1 < len(lines):
                 allow_line = lines[i + 1].strip()
                 if allow_line.startswith("allow"):
-                    existing_ip = allow_line.replace("allow", "").replace(";", "").strip()
-                    
+                    ip = allow_line.replace("allow", "").replace(";", "").strip()
                     parts = line[len("# expires at "):].split(" - ", 1)
-                    existing_expires = parts[0].strip()
-                    existing_comment = parts[1].strip() if len(parts) > 1 else ""
-
+                    expires = parts[0].strip()
+                    comment = parts[1].strip() if len(parts) > 1 else ""
                     entries.append({
-                        "ip": existing_ip,
-                        "expires": existing_expires,
-                        "comment": existing_comment
+                        "ip": ip,
+                        "expires": expires,
+                        "comment": comment
                     })
                 i += 2
             else:
                 i += 1
+    return entries
+
+def write_whitelist_file(entries):
+    """
+    Writes the whitelist as:
+    entries = [{'ip':..., 'expires':..., 'comment':...}, ...]
+    """
+    tmp_file = DYNAMIC_WHITELIST_FILE + ".tmp"
+    with open(tmp_file, "w") as f:
+        for entry in entries:
+            comment_text = f" - {entry['comment']}" if entry["comment"] else ""
+            f.write(f"# expires at {entry['expires']}{comment_text}\n")
+            f.write(f"allow {entry['ip']};\n")
+    os.replace(tmp_file, DYNAMIC_WHITELIST_FILE)
+
+def cleanup_expired():
+    """
+    Removes expired ips from whitelist
+    """
+    now = datetime.datetime.now()
+    entries = read_whitelist()
+
+    new_entries = []
+    for entry in entries:
+        try:
+            expire_time = datetime.datetime.fromisoformat(entry["expires"])
+            if expire_time > now:
+                new_entries.append(entry)
+        except ValueError:
+            pass
+
+    if len(new_entries) != len(entries):
+        write_whitelist_file(new_entries)
+
+def write_whitelist(ip_or_subnet, duration_hours, comment=None):
+    expire_time = datetime.datetime.now() + datetime.timedelta(hours=duration_hours)
+    expire_str = expire_time.isoformat()
+    entries = read_whitelist()
 
     found = False
     for entry in entries:
@@ -54,12 +93,7 @@ def write_whitelist(ip_or_subnet, duration_hours, comment=None):
             "comment": comment or ""
         })
 
-    print(entries)
-    with open(DYNAMIC_WHITELIST_FILE, "w") as f:
-        for entry in entries:
-            comment_text = f" - {entry['comment']}" if entry["comment"] else ""
-            f.write(f"# expires at {entry['expires']}{comment_text}\n")
-            f.write(f"allow {entry['ip']};\n")
+    write_whitelist_file(entries)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -88,6 +122,12 @@ def index():
         return redirect("/")
 
     return render_template("index.html", client_ip=client_ip, subnet=subnet)
+
+@app.route("/cleanup", methods=["POST"])
+def cleanup():
+    cleanup_expired()
+    response = make_response('', 204)
+    return response
 
 if __name__ == "__main__":
     app.run(host="::", port=5000)
