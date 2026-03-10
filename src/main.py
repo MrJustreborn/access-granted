@@ -18,10 +18,17 @@ def write_whitelist(ip_or_subnet, duration_hours):
 @app.route("/", methods=["GET", "POST"])
 def index():
     client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    client_ip = client_ip.split(",")[0].strip()
+
     try:
-        ip_obj = ipaddress.IPv6Address(client_ip)
-        subnet = ipaddress.IPv6Network(f"{client_ip}/64", strict=False)
-    except ipaddress.AddressValueError:
+        ip_obj = ipaddress.ip_address(client_ip)
+
+        if isinstance(ip_obj, ipaddress.IPv6Address):
+            subnet = ipaddress.IPv6Network(f"{client_ip}/64", strict=False)
+        else:
+            subnet = ipaddress.IPv4Network(f"{client_ip}/24", strict=False)
+
+    except ValueError:
         client_ip = "invalid"
         subnet = "invalid"
 
@@ -37,4 +44,4 @@ def index():
     return render_template("index.html", client_ip=client_ip, subnet=subnet)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="::", port=5000)
