@@ -5,7 +5,7 @@ import datetime
 import os
 import subprocess
 
-DYNAMIC_WHITELIST_FILE = "./whitelist_dynamic.conf"
+DYNAMIC_WHITELIST_FILE = "./data/whitelist_dynamic.conf"
 DEFAULT_DURATION_HOURS = 24
 
 app = Flask(__name__)
