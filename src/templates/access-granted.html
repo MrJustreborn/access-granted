@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Access Management</title>
+    <title>Access Granted</title>
     <link rel="stylesheet" href="https://unpkg.com/98.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -17,7 +17,7 @@
 
         .window {
             width: 100%;
-            max-width: 450px;
+            max-width: 400px;
         }
 
         .window-body {
@@ -26,31 +26,17 @@
             gap: 1em;
         }
 
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25em;
-        }
-
-        label {
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        input[type="number"],
-        input[type="text"] {
-            font-size: 1rem;
-            padding: 0.25em;
-        }
-
-        input[type="number"] {
-            width: 100px;
-        }
-
         p {
             font-size: 1.1rem;
             margin: 0;
             word-break: break-all;
+        }
+
+        .message {
+            font-weight: bold;
+            color: green;
+            font-size: 1.2rem;
+            margin-bottom: 0.5em;
         }
 
         .buttons {
@@ -61,19 +47,17 @@
         }
 
         button.button {
-            flex: 1;
             font-size: 1rem;
+            padding: 0.5em 1em;
         }
 
         @media (max-width: 480px) {
-            input[type="number"],
-            input[type="text"] {
-                font-size: 1.1rem;
+            .message {
+                font-size: 1.3rem;
             }
 
             button.button {
                 font-size: 1.1rem;
-                padding: 0.5em;
             }
         }
     </style>
@@ -81,31 +65,26 @@
 <body>
     <div class="window">
         <div class="title-bar">
-            <div class="title-bar-text">Client Access Management</div>
+            <div class="title-bar-text">Access Granted</div>
             <div class="title-bar-controls">
                 <button aria-label="Close"></button>
             </div>
         </div>
         <div class="window-body">
+            <div class="message">✅ Access Granted!</div>
             <p><strong>Client IP:</strong><br>{{ client_ip }}</p>
-            <p><strong>Subnet:</strong><br>{{ subnet }}</p>
+            <p><strong>/64 Subnet:</strong><br>{{ subnet }}</p>
+            <p><strong>Duration:</strong><br>{{ duration }} hours</p>
+            {% if comment %}
+            <p><strong>Comment:</strong><br>{{ comment }}</p>
+            {% endif %}
 
-            <form method="post">
-                <div class="field-group">
-                    <label for="duration">Duration (hours):</label>
-                    <input type="number" id="duration" name="duration" value="24" min="1" max="48">
-                </div>
-
-                <div class="field-group">
-                    <label for="comment">Comment:</label>
-                    <input type="text" id="comment" name="comment" maxlength="48" placeholder="Optional comment">
-                </div>
-
+            <form method="post" action="/granted">
                 <div class="buttons">
-                    <button class="button" type="submit" name="target" value="client">Grant Client</button>
-                    <button class="button" type="submit" name="target" value="subnet">Grant Subnet</button>
+                    <button class="button" type="submit" name="target" value="back">Back</button>
+                    <button class="button" type="submit" name="target" value="next">Ok</button>
                 </div>
-            </form>
+            </form>            
         </div>
     </div>
 </body>

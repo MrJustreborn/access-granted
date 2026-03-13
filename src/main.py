@@ -1,5 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, request, redirect, make_response
+from urllib.parse import urlencode
 import ipaddress
 import datetime
 import os
@@ -125,14 +126,41 @@ def index():
     if request.method == "POST":
         target = request.form.get("target")
         duration = int(request.form.get("duration", DEFAULT_DURATION_HOURS))
-        ccomment = request.form.get("comment")
+        comment = request.form.get("comment")
         if target == "client":
-            write_whitelist(client_ip, duration, ccomment)
+            write_whitelist(client_ip, duration, comment)
         elif target == "subnet":
-            write_whitelist(str(subnet), duration, ccomment)
-        return redirect("/")
+            write_whitelist(str(subnet), duration, comment)
+        params = urlencode({
+            "ip": client_ip,
+            "subnet": str(subnet),
+            "duration": duration,
+            "comment": comment or ""
+        })
+        return redirect(f"/granted?{params}")
 
     return render_template("index.html", client_ip=client_ip, subnet=subnet)
+
+@app.route("/granted", methods=["GET", "POST"])
+def granted():
+    if request.method == "POST":
+        target = request.form.get("target")
+        if target == "back":
+            return redirect("/")
+        elif target == "next":
+            return redirect("http://google.com")
+    
+    client_ip = request.args.get("ip")
+    subnet = request.args.get("subnet")
+    duration = request.args.get("duration")
+    comment = request.args.get("comment")
+    return render_template(
+            "access-granted.html",
+            client_ip=client_ip,
+            subnet=subnet,
+            duration=duration,
+            comment=comment
+        )
 
 @app.route("/cleanup", methods=["POST"])
 def cleanup():
