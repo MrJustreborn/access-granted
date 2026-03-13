@@ -3,18 +3,21 @@
 <head>
     <title>Access Management</title>
     <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            background-color: #008080; /* typischer Win98 Desktop-Hintergrund */
+            background-color: #008080; /* Win98 Desktop-Hintergrund */
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             font-family: "MS Sans Serif", sans-serif;
+            padding: 1em;
         }
 
         .window {
-            width: 400px;
+            width: 100%;
+            max-width: 450px;
         }
 
         .window-body {
@@ -26,25 +29,52 @@
         .field-group {
             display: flex;
             flex-direction: column;
+            gap: 0.25em;
         }
 
         label {
             font-weight: bold;
-            margin-bottom: 2px;
+            font-size: 1rem;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            font-size: 1rem;
+            padding: 0.25em;
         }
 
         input[type="number"] {
-            width: 80px;
+            width: 100px;
         }
 
-        input[type="text"] {
-            width: 100%;
+        p {
+            font-size: 1.1rem;
+            margin: 0;
+            word-break: break-all;
         }
 
         .buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
+            gap: 0.5em;
+            margin-top: 0.5em;
+        }
+
+        button.button {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            input[type="number"],
+            input[type="text"] {
+                font-size: 1.1rem;
+            }
+
+            button.button {
+                font-size: 1.1rem;
+                padding: 0.5em;
+            }
         }
     </style>
 </head>
@@ -57,8 +87,8 @@
             </div>
         </div>
         <div class="window-body">
-            <p>Client IP: {{ client_ip }}</p>
-            <p>Default /64 Subnet: {{ subnet }}</p>
+            <p><strong>Client IP:</strong><br>{{ client_ip }}</p>
+            <p><strong>Subnet:</strong><br>{{ subnet }}</p>
 
             <form method="post">
                 <div class="field-group">

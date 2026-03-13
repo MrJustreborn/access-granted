@@ -125,10 +125,11 @@ def index():
     if request.method == "POST":
         target = request.form.get("target")
         duration = int(request.form.get("duration", DEFAULT_DURATION_HOURS))
+        ccomment = request.form.get("comment")
         if target == "client":
-            write_whitelist(client_ip, duration, f"{duration}h")
+            write_whitelist(client_ip, duration, ccomment)
         elif target == "subnet":
-            write_whitelist(str(subnet), duration, f"{duration}h")
+            write_whitelist(str(subnet), duration, ccomment)
         return redirect("/")
 
     return render_template("index.html", client_ip=client_ip, subnet=subnet)
