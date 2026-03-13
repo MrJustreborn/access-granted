@@ -2,18 +2,81 @@
 <html>
 <head>
     <title>Access Management</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <style>
+        body {
+            background-color: #008080; /* typischer Win98 Desktop-Hintergrund */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: "MS Sans Serif", sans-serif;
+        }
+
+        .window {
+            width: 400px;
+        }
+
+        .window-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        input[type="number"] {
+            width: 80px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Client Access Management</h2>
-    <p>Client IP: {{ client_ip }}</p>
-    <p>Default /64 Subnet: {{ subnet }}</p>
+    <div class="window">
+        <div class="title-bar">
+            <div class="title-bar-text">Client Access Management</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <p>Client IP: {{ client_ip }}</p>
+            <p>Default /64 Subnet: {{ subnet }}</p>
 
-    <form method="post">
-        <label>Duration (hours):</label>
-        <input type="number" name="duration" value="24" min="1">
+            <form method="post">
+                <div class="field-group">
+                    <label for="duration">Duration (hours):</label>
+                    <input type="number" id="duration" name="duration" value="24" min="1" max="48">
+                </div>
 
-        <button type="submit" name="target" value="client">Grant Client</button>
-        <button type="submit" name="target" value="subnet">Grant Subnet</button>
-    </form>
+                <div class="field-group">
+                    <label for="comment">Comment:</label>
+                    <input type="text" id="comment" name="comment" maxlength="48" placeholder="Optional comment">
+                </div>
+
+                <div class="buttons">
+                    <button class="button" type="submit" name="target" value="client">Grant Client</button>
+                    <button class="button" type="submit" name="target" value="subnet">Grant Subnet</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
