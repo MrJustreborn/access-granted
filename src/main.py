@@ -6,8 +6,9 @@ import datetime
 import os
 import subprocess
 
-DYNAMIC_WHITELIST_FILE = "./data/whitelist_dynamic.conf"
-DEFAULT_DURATION_HOURS = 24
+DYNAMIC_WHITELIST_FILE = os.environ.get("DYNAMIC_WHITELIST_FILE", "./data/whitelist_dynamic.conf")
+DEFAULT_DURATION_HOURS = int(os.environ.get("DEFAULT_DURATION_HOURS", 24))
+REDIRECT_URL = os.environ.get("REDIRECT_URL", "https://github.com/MrJustreborn/access-granted")
 
 app = Flask(__name__)
 
@@ -148,7 +149,7 @@ def granted():
         if target == "back":
             return redirect("/")
         elif target == "next":
-            return redirect("http://google.com")
+            return redirect(REDIRECT_URL)
     
     client_ip = request.args.get("ip")
     subnet = request.args.get("subnet")

@@ -12,3 +12,5 @@ services:
     restart: unless-stopped
     volumes:
       - "./src/data:/app/data"
+    env_file:
+      - "./env/dev.env"
