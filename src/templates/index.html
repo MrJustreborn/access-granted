@@ -93,7 +93,7 @@
             <form method="post">
                 <div class="field-group">
                     <label for="duration">Duration (hours):</label>
-                    <input type="number" id="duration" name="duration" value="24" min="1" max="48">
+                    <input type="number" id="duration" name="duration" value="{{ hours }}" min="1" max="{{ hours_max }}">
                 </div>
 
                 <div class="field-group">

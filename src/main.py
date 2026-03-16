@@ -8,6 +8,7 @@ import subprocess
 
 DYNAMIC_WHITELIST_FILE = os.environ.get("DYNAMIC_WHITELIST_FILE", "./data/whitelist_dynamic.conf")
 DEFAULT_DURATION_HOURS = int(os.environ.get("DEFAULT_DURATION_HOURS", 24))
+DURATION_HOURS_MAX = int(os.environ.get("DURATION_HOURS_MAX", 48))
 REDIRECT_URL = os.environ.get("REDIRECT_URL", "https://github.com/MrJustreborn/access-granted")
 
 app = Flask(__name__)
@@ -140,7 +141,13 @@ def index():
         })
         return redirect(f"/granted?{params}")
 
-    return render_template("index.html", client_ip=client_ip, subnet=subnet)
+    return render_template(
+        "index.html", 
+        client_ip=client_ip, 
+        subnet=subnet, 
+        hours=DEFAULT_DURATION_HOURS,
+        hours_max=DURATION_HOURS_MAX
+        )
 
 @app.route("/granted", methods=["GET", "POST"])
 def granted():
